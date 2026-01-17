@@ -47,10 +47,26 @@ This skill works best when the following are available:
 
 ## State Management
 
-Track workflow state in `.claude/specify-state.json`:
+Track workflow state in a **cache directory** to avoid polluting the project:
 
+**State file location:** `~/.cache/claude/specify/{project-hash}.json`
+
+The `{project-hash}` is derived from the absolute path of the project directory (e.g., MD5 or similar hash). This allows:
+- Multiple projects to have independent state
+- No clutter in the project directory
+- Easy cleanup with `rm -rf ~/.cache/claude/specify/`
+
+**To compute the state file path:**
+```bash
+# Get project hash from current working directory
+project_hash=$(echo -n "$(pwd)" | md5 | cut -c1-16)
+state_file="$HOME/.cache/claude/specify/${project_hash}.json"
+```
+
+**State structure:**
 ```json
 {
+  "projectPath": "/absolute/path/to/project",
   "jtbd": "string - the job to be done statement",
   "topics": [
     {
@@ -65,6 +81,8 @@ Track workflow state in `.claude/specify-state.json`:
   "projectType": "detected project type"
 }
 ```
+
+**Auto-cleanup:** After successful spec generation (Phase 4-5 complete), delete the state file automatically. State is only needed for resuming incomplete workflows.
 
 ## Phase 1: JTBD Decomposition
 
@@ -369,14 +387,14 @@ When `$ARGUMENTS` is `init`:
 When `$ARGUMENTS` is `decompose`:
 
 1. Run Phase 1 only
-2. Save state to `.claude/specify-state.json`
+2. Save state to cache file (see State Management)
 3. Do NOT proceed to research or generation
 
 ## Research Sub-command
 
 When `$ARGUMENTS` starts with `research`:
 
-1. Load state from `.claude/specify-state.json`
+1. Load state from cache file (see State Management)
 2. Research the specified topic (or all if none specified)
 3. Update state with research results
 4. Do NOT generate specs
@@ -385,10 +403,11 @@ When `$ARGUMENTS` starts with `research`:
 
 When `$ARGUMENTS` is `generate`:
 
-1. Load state from `.claude/specify-state.json`
+1. Load state from cache file (see State Management)
 2. Require completed decomposition
 3. Run Phase 4 and 5 only
 4. Generate all spec files
+5. Delete state file after successful generation
 
 ## Template Usage
 
@@ -406,14 +425,14 @@ After running /specify, verify success by checking:
 1. **Spec files exist**: `ls specs/*.md`
 2. **README links work**: All links in `specs/README.md` resolve
 3. **CLAUDE.md updated**: Specifications section present
-4. **State cleaned**: `.claude/specify-state.json` can be deleted if workflow complete
+4. **State auto-cleaned**: Cache file deleted after successful generation
 
 ## Quick Reference
 
 | Phase | Output | Key Files |
 |-------|--------|-----------|
-| Decompose | Topics list | `.claude/specify-state.json` |
-| Research | Design decisions | state.json updated |
+| Decompose | Topics list | `~/.cache/claude/specify/{hash}.json` |
+| Research | Design decisions | cache state updated |
 | Design | Architecture choices | `motif.md` (if needed) |
 | Generate | Specifications | `specs/*.md`, `specs/README.md` |
-| Finalize | CLAUDE.md update | `CLAUDE.md` |
+| Finalize | CLAUDE.md update, state cleanup | `CLAUDE.md` |

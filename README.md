@@ -22,6 +22,11 @@ cp -r skills/<skill-name> ~/.claude/skills/
 cp -r skills/<skill-name> .claude/skills/
 ```
 
+**Quick install for /specify:**
+```bash
+cp -r skills/specify ~/.claude/skills/
+```
+
 Restart Claude Code after installation.
 
 ---

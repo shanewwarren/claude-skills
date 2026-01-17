@@ -1,8 +1,36 @@
-# /specify - Specification-Driven Development Skill
+# Claude Code Skills
 
-A Claude Code skill that transforms Jobs-to-Be-Done (JTBD) into structured specification documents through guided conversation.
+A collection of custom Claude Code skills I've created and am experimenting with. These skills extend Claude Code's capabilities for specific workflows.
 
-## What is /specify?
+## Skills
+
+| Skill | Description |
+|-------|-------------|
+| [/specify](#specify) | Specification-driven development through JTBD decomposition |
+
+---
+
+## Installation
+
+Copy the skill folder(s) you want to your Claude Code skills directory:
+
+```bash
+# Personal skills (available in all projects)
+cp -r skills/<skill-name> ~/.claude/skills/
+
+# Or project-specific skills
+cp -r skills/<skill-name> .claude/skills/
+```
+
+Restart Claude Code after installation.
+
+---
+
+## /specify
+
+Transforms Jobs-to-Be-Done (JTBD) into structured specification documents through guided conversation.
+
+### What It Does
 
 `/specify` helps you create comprehensive technical specifications before writing code. Instead of diving straight into implementation, it guides you through:
 
@@ -14,39 +42,6 @@ A Claude Code skill that transforms Jobs-to-Be-Done (JTBD) into structured speci
 
 The result is a `specs/` directory with structured documentation that serves as a blueprint for implementation.
 
-## Installation
-
-Copy the `skills/specify` folder to your Claude Code skills directory:
-
-```bash
-# Personal skills (available in all projects)
-cp -r skills/specify ~/.claude/skills/
-
-# Or project-specific skills
-cp -r skills/specify .claude/skills/
-```
-
-Restart Claude Code after installation.
-
-## Usage
-
-### Full Workflow
-
-Run the complete specification workflow:
-
-```
-/specify
-```
-
-Claude will guide you through an interactive conversation:
-
-1. **Project Detection** - Identifies your project type and existing specs
-2. **JTBD Capture** - Asks what job your users are trying to accomplish
-3. **Topic Decomposition** - Breaks the job into 3-7 distinct topics
-4. **Research** - Analyzes codebase patterns and external best practices
-5. **Design Decisions** - Creates `motif.md` when architectural choices are needed
-6. **Spec Generation** - Outputs `specs/README.md` and individual spec files
-
 ### Sub-commands
 
 | Command | Description |
@@ -56,6 +51,14 @@ Claude will guide you through an interactive conversation:
 | `/specify decompose` | JTBD decomposition without research or generation |
 | `/specify research <topic>` | Research a specific topic |
 | `/specify generate` | Generate specs from existing decomposition state |
+
+### When to Use Each
+
+- **Starting fresh?** → Use `/specify` (full workflow)
+- **Already have specs/ directory?** → Use `/specify init` (structure only)
+- **Just need to break down a feature?** → Use `/specify decompose`
+- **Need to research a specific area?** → Use `/specify research <topic>`
+- **Have decomposition, ready to write specs?** → Use `/specify generate`
 
 ### Example Session
 
@@ -104,7 +107,7 @@ Claude: Generating specifications...
 - Updated CLAUDE.md
 ```
 
-## Output Structure
+### Output Structure
 
 After running `/specify`, your project will have:
 
@@ -134,16 +137,7 @@ Each spec file includes (as applicable):
 - **Security Considerations** - Auth, validation, data protection
 - **Implementation Phases** - Suggested build order
 
-## Topic Decomposition Rules
-
-Topics are validated against these criteria:
-
-- **One Sentence Without 'And'** - Each topic must be describable in a single sentence without using "and"
-- **5-15 Words** - Concise but descriptive
-- **No Overlap** - Topics should be semantically distinct
-- **Actionable** - Uses verbs like track, display, manage, validate, sync
-
-## Design Decisions (motif.md)
+### Design Decisions (motif.md)
 
 When significant architectural choices exist, `/specify` generates a `motif.md` file presenting options:
 
@@ -165,26 +159,19 @@ Full access control...
 
 You review the options and tell Claude your preference before specs are generated.
 
-## Philosophy
-
-`/specify` implements Phase 1 of specification-driven development:
-
-1. **SPECIFYING** (this skill) - Transform JTBD into structured specs
-2. **PLANNING** - Generate implementation tasks from specs
-3. **BUILDING** - Execute the implementation plan
-
-Specs describe *intent* and *design*, not implementation details. They provide structure for planning while preserving implementation flexibility.
-
-## Files Included
+### Files
 
 ```
 skills/specify/
-├── SKILL.md              # Main skill instructions
-├── motif-template.md     # Design decision document template
-├── readme-template.md    # Specs index template
-└── spec-template.md      # Individual spec file template
+├── SKILL.md       # Main skill instructions
+├── LICENSE.txt    # Apache 2.0 license
+├── motif.md       # Design decision document template
+├── readme.md      # Specs index template
+└── spec.md        # Individual spec file template
 ```
+
+---
 
 ## License
 
-MIT
+Skills in this repository are licensed under Apache 2.0 unless otherwise noted. See individual skill directories for specific license files.

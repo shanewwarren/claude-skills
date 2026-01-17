@@ -2,6 +2,7 @@
 name: specify
 description: Specification-driven development skill. Guides users through Jobs-to-Be-Done (JTBD) decomposition to generate comprehensive specs. Use when user wants to create specifications, define features, plan a new project, or says /specify.
 user-invocable: true
+license: Apache-2.0
 ---
 
 # Specification Generator
@@ -19,6 +20,30 @@ Parse `$ARGUMENTS` to determine which sub-command to run:
 | `decompose` | JTBD decomposition only |
 | `research <topic>` | Research specific topic |
 | `generate` | Generate specs from existing decomposition |
+
+## When to Use Each Sub-command
+
+### Starting Fresh?
+→ Use `/specify` (full workflow)
+
+### Already Have specs/ Directory?
+→ Use `/specify init` (structure only)
+
+### Just Need to Break Down a Feature?
+→ Use `/specify decompose`
+
+### Need to Research a Specific Area?
+→ Use `/specify research <topic>`
+
+### Have Decomposition, Ready to Write Specs?
+→ Use `/specify generate`
+
+## Dependencies
+
+This skill works best when the following are available:
+- **Context7 MCP** - For external library documentation research
+- **Task tool with Explore agent** - For codebase pattern discovery
+- **Write/Edit tools** - For generating spec files
 
 ## State Management
 
@@ -129,7 +154,7 @@ Update state with per-topic research:
 
 When significant design decisions exist, generate `motif.md` exploration document.
 
-See [motif-template.md](motif-template.md) for the template.
+See [motif.md](motif.md) for the template.
 
 ### When to Generate motif.md
 
@@ -148,7 +173,7 @@ See [motif-template.md](motif-template.md) for the template.
 
 Generate specification files using templates.
 
-See [spec-template.md](spec-template.md) for the full template.
+See [spec.md](spec.md) for the full template.
 
 ### Files to Create
 
@@ -251,6 +276,85 @@ Claude: Generating specifications...
 Ready for implementation planning.
 ```
 
+### Example Output
+
+#### Generated `specs/README.md`
+
+```markdown
+# Reading Tracker Specifications
+
+Design documentation for a personal reading list management application.
+
+## Overview
+
+This directory contains specifications for the project's features and systems.
+
+**Status Legend:**
+- **Planned** - Design complete, not yet implemented
+- **In Progress** - Currently being implemented
+- **Implemented** - Feature complete and in production
+
+---
+
+## Core Features
+
+| Spec | Status | Purpose |
+|------|--------|---------|
+| [book-catalog.md](./book-catalog.md) | Planned | Storing and retrieving book information |
+| [reading-status.md](./reading-status.md) | Planned | Tracking read/unread/in-progress state |
+| [list-management.md](./list-management.md) | Planned | Creating and organizing reading lists |
+| [reading-progress.md](./reading-progress.md) | Planned | Recording pages read and notes |
+
+## Social Features
+
+| Spec | Status | Purpose |
+|------|--------|---------|
+| [sharing.md](./sharing.md) | Planned | Link-based list sharing with others |
+```
+
+#### Generated `specs/book-catalog.md` (excerpt)
+
+```markdown
+# Book Catalog Specification
+
+**Status:** Planned
+**Version:** 1.0
+**Last Updated:** 2025-01-15
+
+---
+
+## 1. Overview
+
+### Purpose
+
+The book catalog provides the core data model for storing and retrieving book information. It serves as the foundation for all other features in the reading tracker.
+
+### Goals
+
+- **Complete book metadata** - Store title, author, ISBN, cover image, and page count
+- **Fast lookup** - Support search by title, author, or ISBN
+- **Extensible schema** - Allow custom fields for user-defined metadata
+
+### Non-Goals
+
+- **External sync** - No integration with Goodreads or other services (deferred)
+- **Social features** - Book recommendations handled in separate spec
+
+---
+
+## 2. Architecture
+
+### Component Structure
+
+src/
+├── models/
+│   └── book.ts          # Book entity and types
+├── repositories/
+│   └── book-repo.ts     # Data access layer
+└── services/
+    └── book-service.ts  # Business logic
+```
+
 ## Init Sub-command
 
 When `$ARGUMENTS` is `init`:
@@ -285,3 +389,31 @@ When `$ARGUMENTS` is `generate`:
 2. Require completed decomposition
 3. Run Phase 4 and 5 only
 4. Generate all spec files
+
+## Template Usage
+
+**MANDATORY**: Before generating specs, read the template files:
+- `motif.md` - For design exploration documents
+- `spec.md` - For specification files
+- `readme.md` - For the specs index
+
+Follow these templates exactly for consistent output.
+
+## Verification
+
+After running /specify, verify success by checking:
+
+1. **Spec files exist**: `ls specs/*.md`
+2. **README links work**: All links in `specs/README.md` resolve
+3. **CLAUDE.md updated**: Specifications section present
+4. **State cleaned**: `.claude/specify-state.json` can be deleted if workflow complete
+
+## Quick Reference
+
+| Phase | Output | Key Files |
+|-------|--------|-----------|
+| Decompose | Topics list | `.claude/specify-state.json` |
+| Research | Design decisions | state.json updated |
+| Design | Architecture choices | `motif.md` (if needed) |
+| Generate | Specifications | `specs/*.md`, `specs/README.md` |
+| Finalize | CLAUDE.md update | `CLAUDE.md` |

@@ -7,6 +7,7 @@ A collection of custom Claude Code skills I've created and am experimenting with
 | Skill | Description |
 |-------|-------------|
 | [/specify](#specify) | Specification-driven development through JTBD decomposition |
+| [/north-star](#north-star) | One-screen status of a project against its vision: what's built, what's open, what has drifted |
 
 ---
 
@@ -25,6 +26,11 @@ cp -r skills/<skill-name> .claude/skills/
 **Quick install for /specify:**
 ```bash
 cp -r skills/specify ~/.claude/skills/
+```
+
+**Quick install for /north-star:**
+```bash
+cp -r skills/north-star ~/.claude/skills/
 ```
 
 Restart Claude Code after installation.
@@ -173,6 +179,66 @@ skills/specify/
 ├── motif.md       # Design decision document template
 ├── readme.md      # Specs index template
 └── spec.md        # Individual spec file template
+```
+
+---
+
+## /north-star
+
+Prints one screen that answers "where are we against the vision?" for the project in the working directory.
+
+### What It Does
+
+After a handful of sessions, it's easy for both you and the agent to lose track of what the project is for and where it stands. `/north-star` rebuilds that picture from the record instead of from memory:
+
+1. **Finds the vision doc.** It follows the docs that `CLAUDE.md` or `AGENTS.md` point to, or looks for files like `VISION.md`, `BET.md` or `ROADMAP.md`.
+2. **Lists the goals.** These are the dated or measurable outcomes the doc names, such as milestones and success signals.
+3. **Gathers the work.** Built work comes from `git log` on the default branch. Open work comes from open PRs and the issue tracker, through its MCP server or CLI. Planned work is goal scope that nothing has built or picked up, plus unchecked `- [ ]` items in the docs.
+4. **Ties each item to a goal.** Work that serves no goal, and goals that nothing is moving, show up as drift.
+5. **Prints the screen.** It checks every claim against its source first.
+
+When docs disagree with git or the tracker, the record wins and the stale doc is named. A backlog ticket counts as open but parked, so a goal with only backlog tickets reads as idle.
+
+### No vision doc yet?
+
+If the project has none, `/north-star` asks three questions once (who it's for, what success looks like with dates or numbers, what's out of scope), with draft answers taken from the README and the code. It writes `docs/NORTH_STAR.md` and adds a pointer line to `CLAUDE.md`, so later sessions read the vision before planning work.
+
+### Example Output
+
+```markdown
+# Trailcam
+
+Trail-camera owners get their photos sorted by species on their own machine. Success is a
+90%-accurate sort of a real memory card by 2026-12-31.
+
+**Now:** G1 is 35 days out and idle, because bundling the local model has no ticket. G2 is moving on ENG-12.
+
+### G1 · First real sort · Nov 15 · 35 days · idle
+- **Built:** a folder-per-species sorter and the CLI entry point.
+- **Left:** bundling the local model, and a labeled test set.
+- **Checklist:** 2 unchecked. The soonest is collecting 500 labeled photos, due Nov 1 (docs/NORTH_STAR.md).
+
+### G2 · Single binary · Jan 31 · 112 days · moving
+- **Open:** ENG-12, a release build for Linux and macOS.
+
+### Drift
+- G1 is idle. Bundling the local model has no ticket.
+
+*Sources: docs/NORTH_STAR.md · 14 commits since 2026-09-02 · Linear: 1 of 9 open*
+```
+
+### Requirements
+
+- A git repository. `gh` is needed for open PRs.
+- An issue tracker reachable through an MCP server or CLI, if you want tickets on the screen. Without one, the sources line names the gap.
+
+### Files
+
+```
+skills/north-star/
+├── SKILL.md       # Main skill instructions
+├── INTERVIEW.md   # One-time interview for projects with no vision doc
+└── LICENSE.txt    # Apache 2.0 license
 ```
 
 ---
